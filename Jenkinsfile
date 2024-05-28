@@ -14,7 +14,7 @@ pipeline {
             }
              post {
                 always {
-                   junit "target/surefire-reports/*.xml"
+                  junit "target/surefire-reports/*.xml"
                   jacoco execPattern: "target/jacoco.exec"
                 }
              }
@@ -30,7 +30,7 @@ pipeline {
     }
     stage('Kubernetes Deployment - DEV') {
       steps {
-        withKubeConfig([credentialsId: 'kube']) {
+        withKubeConfig([credentialsId: 'kubeconfig']) {
           sh "sed -i 's#replace#janadevps1/numeric-app:${GIT_COMMIT}#g' k8s_deployment_service.yaml"
           sh "kubectl apply -f k8s_deployment_service.yaml"
         }
