@@ -4,7 +4,7 @@ pipeline {
     deploymentName = "devsecops"
     containerName = "devsecops-container"
     serviceName = "devsecops-svc"
-    imageName = janadevps1/numeric-app:${GIT_COMMIT}"
+    imageName = "janadevps1/numeric-app:${GIT_COMMIT}"
   }
 
   stages {
