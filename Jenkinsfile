@@ -1,5 +1,11 @@
 pipeline {
   agent any
+  environment {
+    deploymentName = "devsecops"
+    containerName = "devsecops-container"
+    serviceName = "devsecops-svc"
+    imageName = janadevps1/numeric-app:${GIT_COMMIT}"
+  }
 
   stages {
       stage('Build Artifact') {
@@ -81,15 +87,34 @@ pipeline {
       }
     }
     
-    stage('Kubernetes Deployment - DEV') {
-     steps {
-       withKubeConfig([credentialsId: 'kubeconfig']) {
-         sh "sed -i 's#replace#janadevps1/numeric-app:${GIT_COMMIT}#g' k8s_deployment_service.yaml"
-        sh "kubectl apply -f k8s_deployment_service.yaml"
-       }
+    //stage('Kubernetes Deployment - DEV') {
+     //steps {
+      // withKubeConfig([credentialsId: 'kubeconfig']) {
+       //  sh "sed -i 's#replace#janadevps1/numeric-app:${GIT_COMMIT}#g' k8s_deployment_service.yaml"
+        //sh "kubectl apply -f k8s_deployment_service.yaml"
+       //}
+      //}
+
+    //}
+
+    stage('K8S Deployment - DEV') {
+      steps {
+        parallel(
+          "Deployment": {
+            withKubeConfig([credentialsId: 'kubeconfig']) {
+              sh "bash k8s-deployment.sh"
+            }
+          },
+          "Rollout Status": {
+            withKubeConfig([credentialsId: 'kubeconfig']) {
+              sh "bash k8s-deployment-rollout-status.sh"
+            }
+          }
+        )
       }
     }
 
+  }
     
     }
 }
